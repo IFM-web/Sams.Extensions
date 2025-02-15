@@ -1,0 +1,343 @@
+﻿@using Sams.Extensions.Web
+@using Sams.Extensions
+@using Sams.Extensions.Model
+@using Sams.Extensions.Utility;
+@model Sams.Extensions.Web.Models.VEIWMODEL
+@{
+    Layout = null;
+}
+<style>
+    @@media print {
+        .start-new-page {
+            page-break-before: always;
+        }
+    }
+</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Model.midhead.BRANCHCODE</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+</head>
+<body>
+    <div style="padding:10px;">
+        <input action="action"
+               onclick="window.history.go(-1); return false;"
+               type="submit"
+               value="Back to Home" id="btnback" class="btn btn-primary" />
+        <input type="submit" class="btn btn-primary" id="btnpdf" value="Export to PDF" onclick="triggerPrint()" />
+    </div>
+    <div id="pdfexport" class="no-split">
+
+        <div id="FinalReport" style="padding: 10px; text-align: center;">
+            <img style="width: 120px; padding-bottom: 8px; margin-left: 804px;" src="~/Images/logo.png" /><br />
+            <table class="table-bordered" style="
+               width: 100%; text-align:center; border-spacing:0px;
+               ">
+                <thead>
+                    <tr>
+                        <th colspan="5" style="background-color: #EB8317; color: white; font-family: Arial; font-size: 11px; font-weight: bold; border: 1px solid #000000 !important; padding: 10px; font-size: 20px; margin-bottom: 10px;">
+                            AXIS MAX LIFE BRANCH SUPERVISOR VISIT REPORT
+                        </th>
+
+                    </tr>
+                    <tr>
+                        <td height="10px;"></td>
+
+                    </tr>
+                    <tr style="color:black;font-family:Arial;font-size:11px;font-weight:bold;">
+                        <th style="border: 1px solid #000000 !important;padding: 10px;">Branch Code</th>
+                        <th style="border: 1px solid #000000 !important;padding: 10px;">Branch Name</th>
+                        <th style="border: 1px solid #000000 !important;padding: 10px;">APS Representative</th>
+                        <th style="border: 1px solid #000000 !important;padding: 10px;">Visit date</th>
+                        @*<th style="border: 1px solid #000000 !important;padding: 10px;">Checklist Type</th>*@
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr style="    background-color: rgba(var(--bs-info-rgb), var(--bs-bg-opacity)) !important;color:black;font-family:Arial;font-size:11px;">
+                        <td style="border: 1px solid #000000 !important;padding: 10px;">@Model.midhead.BRANCHCODE</td>
+                        <td style="border: 1px solid #000000 !important;padding: 10px;">@Model.midhead.BRANCHNAME</td>
+                        <td style="border: 1px solid #000000 !important;padding: 10px;">@Model.midhead.FONAME</td>
+                        <td style="border: 1px solid #000000 !important;padding: 10px;">@Model.midhead.AUDITTIME</td>
+                        @*<td style="border: 1px solid #000000 !important;padding: 10px;">@Model.midhead.CHECKLISTYPE</td>*@
+                    </tr>
+                </tbody>
+            </table>
+            <br />
+
+            <table id="table1" class="table-bordered" style="width: 100%;border-spacing:0px;
+">
+                <thead>
+                    <tr id="row1" style="background-color: #EB8317; color: White; font-family: Arial; font-size: 11px; font-weight: bold; ">
+                        <th style="border: 1px solid #000000 !important;padding: 10px;width:9.7%" class="Column1 text-center">
+                            S.No.
+                        </th>
+                        <th style="border: 1px solid #000000 !important;padding: 10px;width:20%" class="Column2 text-center">
+                            Question
+                        </th>
+                        <th style="border: 1px solid #000000 !important; padding: 10px;width:19%" class="Column3 text-center">
+                            Response
+                        </th>
+                        <th style="border: 1px solid #000000 !important; padding: 10px;width:27%" class="Column4 text-center">
+                            Photo
+                        </th>
+                        <th style="border: 1px solid #000000 !important;padding: 10px;width:25%" class="Column5 text-center">
+                            Comments
+                        </th>
+                    </tr>
+
+                </thead>
+            </table>
+            <table class="table-bordered" style="width: 100%;border-spacing:0px;">
+                <thead>
+
+                    <tr>
+                        <th colspan="5" style="background-color: silver;color:black;font-family:Arial;font-size:11px;font-weight:bold;text-align:center;padding:5px;width: 1px;border: 1px solid #000000 !important;padding: 10px;">
+                            @Model.midhead1.CHECKLISTYPE
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+
+            @{
+                int i = 1;
+            }
+            @foreach (var item in Model.subheader1.Select(x => x.MAINHEADER).Distinct())
+            {
+
+                <table id="table2" class="table-bordered" style="width: 100%;border-spacing:0px;">
+
+                    <thead>
+
+                        <tr>
+                            <th colspan="5" style="background-color: silver;color:black;font-family:Arial;font-size:11px;font-weight:bold;text-align:center;padding:5px;width: 1px;border: 1px solid #000000 !important;padding: 10px;">
+                                @item
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var subhead in Model.maxaudit1.Where(x => x.MAINHEADER == item))
+                        {
+                            <tr id="row1" style="background-color: white;color:black;font-family:Verdana;font-size:10px;font-weight:normal;text-align: center;">
+                                <td style="border: 1px solid #000000 !important;padding: 10px;width:10%" class="Column1">
+                                    @i
+                                </td>
+                                <td style="border: 1px solid #000000 !important; padding: 10px; width: 20%" class="Column2">
+                                    @subhead.SUBHEADER
+                                </td>
+                                <td style="border: 1px solid #000000 !important; padding: 10px; width: 20%" class="Column3">
+                                    @subhead.TEXT
+                                </td>
+                                <td style="border: 1px solid #000000 !important; padding: 10px; width: 15%" class="Column4 text-center">
+                                    <div style="padding: 5px;">
+                                        <div class="row">
+
+                                            <a href="@Url.Action("ViewMore", "BranchNew",new {CheckListId=subhead.CHECKLIST_ID,AuditDate=Model.midhead.AUDITTIME,Location=subhead.LocationAutoId,Branch=subhead.BRANCHCODE,CheckListType=subhead.CHECKLISTTYPE })" target="_blank">
+                                                @if (subhead.IMGAUTO_ID != 0)
+                                                {
+                                                    <img style="width:150px;height:125px ;margin: 0 auto;" src="@Url.Action("RetrieveImage", "BranchNew", new {ImageId = subhead.IMGAUTO_ID})">
+                                                }
+                                                else
+                                                {
+
+                                                    <p style="width:150px;height:125px ;margin: 0 auto;">
+
+                                                    </p>
+
+                                                }
+
+                                            </a>
+
+                                            <input type="hidden" id="imgUrl" value="@Url.Action("RetrieveImage", "BranchNew", new {ImageId = subhead.IMGAUTO_ID})">
+
+
+                                        </div>
+                                        <div class="row">
+                                            @*<a href="@Url.Action("ViewMore", "BranchNew",new {CheckListId=subhead.CHECKLIST_ID,AuditDate=Model.midhead.AUDITTIME,Location=subhead.LocationAutoId,Branch=subhead.BRANCHCODE,CheckListType=subhead.CHECKLISTTYPE })" target="_blank">View More</a>*@
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="border: 1px solid #000000 !important; padding: 10px; width: 25%" class="Column5">
+                                    @subhead.REMARKS
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    </tbody>
+                </table>
+
+            }
+            <br />
+            <div @*style=" margin-top: 41px; "*@ class="start-new-page">
+
+                <table class="table-bordered" style="width: 100%;border-spacing:0px;">
+                    <thead>
+
+                        <tr>
+                            <th colspan="5" style="background-color: silver;color:black;font-family:Arial;font-size:11px;font-weight:bold;text-align:center;padding:5px;width: 1px;border: 1px solid #000000 !important;padding: 10px;">
+                                @Model.midhead.CHECKLISTYPE
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+                <table id="table1" class="table-bordered" style="width: 100%;border-spacing:0px;
+">
+                    <thead>
+                        <tr id="row1" style="background-color: #EB8317; color: White; font-family: Arial; font-size: 11px; font-weight: bold; ">
+                            <th style="border: 1px solid #000000 !important;padding: 10px;width:9.7%" class="Column1 text-center">
+                                S.No.
+                            </th>
+                            <th style="border: 1px solid #000000 !important;padding: 10px;width:20%" class="Column2 text-center">
+                                Question
+                            </th>
+                            <th style="border: 1px solid #000000 !important; padding: 10px;width:19%" class="Column3 text-center">
+                                Response
+                            </th>
+                            <th style="border: 1px solid #000000 !important; padding: 10px;width:27%" class="Column4 text-center">
+                                Photo
+                            </th>
+                            <th style="border: 1px solid #000000 !important;padding: 10px;width:25%" class="Column5 text-center">
+                                Comments
+                            </th>
+                        </tr>
+
+                    </thead>
+                </table>
+
+
+                @{
+                    int j = 1;
+                }
+                @foreach (var item in Model.subheader.Select(x => x.MAINHEADER).Distinct())
+                {
+                    <table id="table2" class="table-bordered" style="width: 100%;border-spacing:0px;">
+
+                        <thead>
+
+                            <tr>
+                                <th colspan="5" style="background-color: silver;color:black;font-family:Arial;font-size:11px;font-weight:bold;text-align:center;padding:5px;width: 1px;border: 1px solid #000000 !important;padding: 10px;">
+                                    @item
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var subhead in Model.maxaudit.Where(x => x.MAINHEADER == item))
+                            {
+                                <tr id="row1" style="background-color: white;color:black;font-family:Verdana;font-size:11px;font-weight:normal;text-align: center;">
+                                    <td style="border: 1px solid #000000 !important;padding: 10px;width:10%" class="Column1">
+                                        @j
+                                    </td>
+                                    <td style="border: 1px solid #000000 !important; padding: 10px; width: 20%" class="Column2">
+                                        @subhead.SUBHEADER
+                                    </td>
+                                    <td style="border: 1px solid #000000 !important; padding: 10px; width: 20%" class="Column3">
+                                        @subhead.TEXT
+                                    </td>
+                                    <td style="border: 1px solid #000000 !important; padding: 10px; width: 15%" class="Column4 text-center">
+                                        <div style="padding: 5px;">
+                                            <div class="row">
+
+                                                <a href="@Url.Action("ViewMore", "BranchNew",new {CheckListId=subhead.CHECKLIST_ID,AuditDate=Model.midhead.AUDITTIME,Location=subhead.LocationAutoId,Branch=subhead.BRANCHCODE,CheckListType=subhead.CHECKLISTTYPE })" target="_blank">
+                                                    @if (subhead.IMGAUTO_ID != 0)
+                                                    {
+                                                        <img style="width:150px;height:125px ;margin: 0 auto;" src="@Url.Action("RetrieveImage", "BranchNew", new {ImageId = subhead.IMGAUTO_ID})">
+                                                    }
+                                                    else
+                                                    {
+
+                                                        <p style="width:150px;height:125px ;margin: 0 auto;">
+
+                                                        </p>
+
+                                                    }
+
+                                                </a>
+
+                                                <input type="hidden" id="imgUrl" value="@Url.Action("RetrieveImage", "BranchNew", new {ImageId = subhead.IMGAUTO_ID})">
+
+
+                                            </div>
+                                            <div class="row">
+                                                @*<a href="@Url.Action("ViewMore", "BranchNew",new {CheckListId=subhead.CHECKLIST_ID,AuditDate=Model.midhead.AUDITTIME,Location=subhead.LocationAutoId,Branch=subhead.BRANCHCODE,CheckListType=subhead.CHECKLISTTYPE })" target="_blank">View More</a>*@
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="border: 1px solid #000000 !important; padding: 10px; width: 25%" class="Column5">
+                                        @subhead.REMARKS
+                                    </td>
+                                </tr>
+                                j++;
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+
+
+            <div id="signature">
+                <div style="display: flex; justify-content: space-evenly; align-items: center;">
+                    <!-- Staff Signature -->
+                    <div style="text-align: center; margin: 20px;">
+                        <div style="border: 1px solid black; width: 283px; height: 150px; margin-left: -12px;">
+                            <img id="myImg" style="width: 200px; height: 100px;" src="@ViewBag.Image1" alt="Visit Image">
+                        </div>
+                        <p style="margin-top: 10px;">SPOC Signature</p>
+                        <p style="margin-top: 10px;">(AXIS Max Life Insurance)</p>
+                    </div>
+                    <!-- Client Signature -->
+                    <div style="text-align: center; margin: 20px;">
+                        <div style="border: 1px solid black; width: 283px; height: 150px;">
+                            @if (ViewBag.Image2 != null)
+                            {
+                                <img style="width: 200px; height: 100px;" src="@ViewBag.Image2" alt="Visit Image">
+                            }
+                        </div>
+                        <p style="margin-top: 10px;">Supervisor Signature</p>
+                        <p style="margin-top: 10px;">(AP Securitas)</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+@*<script src="~/Scripts/CommonFunctions.js"></script>*@
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript">
+
+    function triggerPrint() {
+        // Register before and after print events
+        window.onbeforeprint = function () {
+            $('#btnpdf').hide();
+            $('#btnback').hide();
+        };
+
+        window.onafterprint = function () {
+            $('#btnpdf').show();
+            $('#btnback').show();
+        };
+
+        // Trigger the print dialog
+        var timeoutId = setTimeout(function () {
+            window.print();
+        }, 2000);
+
+
+    }
+</script>
+
+
+
