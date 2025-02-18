@@ -8,13 +8,20 @@ namespace Sams.Extensions.Web
 {
     public partial class Startup
     {
+    
         public void Configuration(IAppBuilder app)
         {
-            //ConfigureAuth(app);
+            // Increase request size (OWIN-specific workaround)
+            app.Use(async (context, next) =>
+            {
+                context.Request.Body = new System.IO.MemoryStream(); // Allow larger requests
+                await next.Invoke();
+            });
+
+            
         }
 
 
-       
 
 
 

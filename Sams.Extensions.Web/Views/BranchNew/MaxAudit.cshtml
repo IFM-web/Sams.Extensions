@@ -379,7 +379,7 @@
 
     //}
     function triggerPrint2() {
-     
+
         $("#loaderdiv").show(); // Show the image before exporting
 
         const { jsPDF } = window.jspdf;
@@ -396,8 +396,8 @@
                     doc.addPage(); // Add a new page if content exceeds page height
                 }
 
-                doc.save("pdffile.pdf");
-                $("#loaderdiv").hide(); 
+                doc.save('@Model.midhead.BRANCHCODE'+".pdf");
+                $("#loaderdiv").hide();
             },
             x: 10,
             y: 10,
@@ -409,7 +409,7 @@
 
 
 
- 
+
 
 
 
