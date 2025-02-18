@@ -18,7 +18,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@Model.midhead.BRANCHCODE</title>
+    <title>@Model.midhead.BRANCHNAME - @Model.midhead.BRANCHCODE</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
@@ -396,7 +396,7 @@
                     doc.addPage(); // Add a new page if content exceeds page height
                 }
 
-                doc.save('@Model.midhead.BRANCHCODE'+".pdf");
+                doc.save('@Model.midhead.BRANCHNAME' +'-'+' @Model.midhead.BRANCHCODE'+".pdf");
                 $("#loaderdiv").hide();
             },
             x: 10,
