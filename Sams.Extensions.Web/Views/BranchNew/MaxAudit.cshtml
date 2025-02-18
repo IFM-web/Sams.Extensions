@@ -30,6 +30,14 @@
                type="submit"
                value="Back to Home" id="btnback" class="btn btn-primary" />
         <input type="submit" class="btn btn-primary" id="btnpdf" value="Export to PDF" onclick="triggerPrint()" />
+        <input type="submit" class="btn btn-primary" id="btnpdf2" value="PDF" onclick="triggerPrint2()" />
+    </div>
+    <div id="loaderdiv" style="
+    position: fixed;  
+    right: 50vw;
+    transform: translate(50%, 50%); display:none;
+">
+        <img style="width:100px;height:100px;" src="~/Images/loading-waiting.gif" />
     </div>
     <div id="pdfexport" class="no-split">
 
@@ -316,18 +324,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 @*<script src="~/Scripts/CommonFunctions.js"></script>*@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+
 <script type="text/javascript">
 
     function triggerPrint() {
         // Register before and after print events
         window.onbeforeprint = function () {
             $('#btnpdf').hide();
+            $('#btnpdf2').hide();
             $('#btnback').hide();
         };
 
         window.onafterprint = function () {
             $('#btnpdf').show();
             $('#btnback').show();
+            $('#btnpdf2').show();
         };
 
         // Trigger the print dialog
@@ -336,7 +356,64 @@
         }, 2000);
 
 
+
+
     }
+
+    //function triggerPrint() {
+    //    $("#BCIMG").show();
+    //    const { jsPDF } = window.jspdf;
+
+    //    let doc = new jsPDF('l', 'mm', [1500,1500]);
+    //    //let doc = new jsPDF('l', 'mm','a4');
+    //    let pdfjs = document.querySelector('#pdfexport');
+
+    //    doc.html(pdfjs, {
+    //        callback: function (doc) {
+    //            doc.save("Certificate.pdf");
+    //            $("#BCIMG").hide();
+    //        },
+    //        x: 12,
+    //        y: 12
+    //    });
+
+    //}
+    function triggerPrint2() {
+     
+        $("#loaderdiv").show(); // Show the image before exporting
+
+        const { jsPDF } = window.jspdf;
+        let doc = new jsPDF('p', 'mm', 'a4'); // 'p' for Portrait mode
+
+        let pdfjs = document.querySelector('#pdfexport');
+
+        doc.html(pdfjs, {
+            callback: function (doc) {
+                let pageHeight = doc.internal.pageSize.height; // A4 height in mm
+                let contentHeight = pdfjs.offsetHeight * 0.2645; // Convert px to mm
+
+                if (contentHeight > pageHeight - 20) {
+                    doc.addPage(); // Add a new page if content exceeds page height
+                }
+
+                doc.save("pdffile.pdf");
+                $("#loaderdiv").hide(); 
+            },
+            x: 10,
+            y: 10,
+            width: 190, // Adjust width to fit A4 portrait
+            windowWidth: 1024 // Improve rendering for tables
+        });
+    }
+
+
+
+
+ 
+
+
+
+
 </script>
 
 

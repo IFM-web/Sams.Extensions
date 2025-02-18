@@ -1,5 +1,7 @@
 ﻿using Microsoft.Owin;
 using Owin;
+using System.Web.Services.Description;
+
 
 [assembly: OwinStartupAttribute(typeof(Sams.Extensions.Web.Startup))]
 namespace Sams.Extensions.Web
@@ -10,5 +12,7 @@ namespace Sams.Extensions.Web
         {
             //ConfigureAuth(app);
         }
+    
+    
     }
 }
