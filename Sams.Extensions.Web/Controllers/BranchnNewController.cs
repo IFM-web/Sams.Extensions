@@ -119,6 +119,7 @@ namespace Sams.Extensions.Web.Controllers
             foreach (DataRow dr in ds.Tables[3].Rows)
             {
 
+
                 mh1.BRANCHCODE = Convert.ToString(dr["BranchCode"]);
                 mh1.BRANCHNAME = Convert.ToString(dr["BranchName"]);
                 mh1.FONAME = Convert.ToString(dr["FOName"]);
@@ -128,7 +129,7 @@ namespace Sams.Extensions.Web.Controllers
                 mh1.CHECKLISTYPE = Convert.ToString(dr["ChecklistType"]);
               
             }
-            dset = Fill("select * from MaxLifeChecklistImageMaster where ChecklistType=N'securityGuard' and BranchCode='" + Branch + "' and USERID='" + ds.Tables[3].Rows[0]["FOName"] + "' and  ChecklistId in (31, 37) and (convert(varchar,cast(datetime as date),106)) ='"+AuditDate+"' ");
+            dset = Fill("select * from MaxLifeChecklistImageMaster where ChecklistType=N'securityGuard' and BranchCode='" + Branch + "' and USERID='" + ds.Tables[1].Rows[0]["FOName"] + "' and  ChecklistId in (31, 37) and (convert(varchar,cast(datetime as date),106)) ='"+AuditDate+"' ");
             foreach (DataRow dr in ds.Tables[2].Rows)
             {
                 sh1.Add(new SUBHEADER1
