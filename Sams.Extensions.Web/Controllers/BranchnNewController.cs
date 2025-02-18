@@ -1,8 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Office.Word;
 using DocumentFormat.OpenXml.Wordprocessing;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using Sams.Extensions.Business;
 using Sams.Extensions.Dal;
