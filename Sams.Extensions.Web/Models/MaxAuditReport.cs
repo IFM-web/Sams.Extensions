@@ -25,6 +25,7 @@ namespace Sams.Extensions.Web.Models
 
     public class MaxAuditReport
     {
+        public int ChecklistAutoID { get; set; }
         public int CHECKLIST_ID { get; set; }
         public string  MAINHEADER{ get; set; }
         public string SUBHEADER{ get; set; }
@@ -42,6 +43,7 @@ namespace Sams.Extensions.Web.Models
     }
     public class MaxAuditReport1
     {
+        public int ChecklistAutoID { get; set; }
         public int CHECKLIST_ID { get; set; }
         public string MAINHEADER { get; set; }
         public string SUBHEADER { get; set; }

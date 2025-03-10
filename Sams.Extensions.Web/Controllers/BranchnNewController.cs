@@ -7,7 +7,7 @@ using Sams.Extensions.Dal;
 using Sams.Extensions.Logger;
 using Sams.Extensions.Model;
 using Sams.Extensions.Web.Models;
-using SelectPdf;
+using PdfSharp.Pdf;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -15,10 +15,33 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.util;
 using System.Web;
 using System.Web.Mvc;
+using PdfSharp.Pdf;
+using System.Drawing;
+using System.Drawing.Imaging;
+
+using TheArtOfDev.HtmlRenderer.PdfSharp;
+
+
+using PageSize = PdfSharpCore.PageSize;
+using DocumentFormat.OpenXml.Spreadsheet;
+using PdfSharp;
+using SelectPdf;
+using PdfDocument = SelectPdf.PdfDocument;
+using System.Net.Http;
+using System.Threading.Tasks;
+using IronSoftware.Forms;
+using System.Drawing.Imaging;
+using System.Security.Policy;
+using System.Windows.Interop;
+using System.Net.NetworkInformation;
+using System.Web.Hosting;
+
+
 
 namespace Sams.Extensions.Web.Controllers
 {
@@ -29,6 +52,8 @@ namespace Sams.Extensions.Web.Controllers
         private readonly IMasterBusiness _master;
         private readonly ILoggerManager _loggerManager;
         private readonly IBranchCodeData _dataAccesLayer;
+        private readonly PdfSharp.PageSize pageSize;
+
         public BranchNewController(IMasterBusiness master, ILoggerManager loggerManager, IBranchCodeData dataAccesLayer)
         {
             _master = master;
@@ -37,6 +62,9 @@ namespace Sams.Extensions.Web.Controllers
         }
         public ActionResult MaxAudit(string Branch, string AuditDate, string Location, string ChecklistType)
         {
+
+
+
             VEIWMODEL vm = new VEIWMODEL();
             List<MaxAuditReport> mar = new List<MaxAuditReport>();
             List<MaxAuditReport1> mar1 = new List<MaxAuditReport1>();
@@ -57,79 +85,114 @@ namespace Sams.Extensions.Web.Controllers
             DataSet dset = new DataSet();
 
             da.Fill(ds);
-            foreach (DataRow dr in ds.Tables[0].Rows)
+            if (ds.Tables[0].Rows.Count > 0)
             {
-                mar.Add(new MaxAuditReport
+
+
+
+                foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    CHECKLIST_ID = Convert.ToInt32(dr["ChecklistId"]),
-                    MAINHEADER = Convert.ToString(dr["MainHeader"]),
-                    SUBHEADER = Convert.ToString(dr["SubHeader"]),
-                    NEWCHECKLISTID = Convert.ToInt32(dr["NewChecklistId"]),
-                    NEWCHECKLISTFORORDERBY = Convert.ToInt32(dr["NewChecklistIdForOrderBy"]),
-                    CHECKLISTTYPE = Convert.ToString(dr["ChecklistType"]),
-                    BRANCHCODE = Convert.ToString(dr["BranchCode"]),
-                    TEXT = Convert.ToString(dr["Text"]),
-                    REMARKS = Convert.ToString(dr["Remarks"]),
-                    ROWCOUNT = Convert.ToInt32(dr["row_count"]),
-                    HEADERINDEX = Convert.ToInt32(dr["HeaderIndex"]),
-                    IMGAUTO_ID = Convert.ToInt32(dr["ImageAutoId"]),
-                    LocationAutoId = Convert.ToInt32(dr["LocationAutoId"]),
-                });
+                    mar.Add(new MaxAuditReport
+                    {
+                        CHECKLIST_ID = Convert.ToInt32(dr["ChecklistId"]),
+                        MAINHEADER = Convert.ToString(dr["MainHeader"]),
+                        SUBHEADER = Convert.ToString(dr["SubHeader"]),
+                        NEWCHECKLISTID = Convert.ToInt32(dr["NewChecklistId"]),
+                        NEWCHECKLISTFORORDERBY = Convert.ToInt32(dr["NewChecklistIdForOrderBy"]),
+                        CHECKLISTTYPE = Convert.ToString(dr["ChecklistType"]),
+                        BRANCHCODE = Convert.ToString(dr["BranchCode"]),
+                        TEXT = Convert.ToString(dr["Text"]),
+                        REMARKS = Convert.ToString(dr["Remarks"]),
+                        ROWCOUNT = Convert.ToInt32(dr["row_count"]),
+                        HEADERINDEX = Convert.ToInt32(dr["HeaderIndex"]),
+                        IMGAUTO_ID = Convert.ToInt32(dr["ImageAutoId"]),
+                        LocationAutoId = Convert.ToInt32(dr["LocationAutoId"]),
+                    });
+                }
             }
-            foreach (DataRow dr in ds.Tables[1].Rows)
+            if (ds.Tables[1].Rows.Count > 0)
             {
 
-                mh.BRANCHCODE = Convert.ToString(dr["BranchCode"]);
-                mh.BRANCHNAME = Convert.ToString(dr["BranchName"]);
-                mh.FONAME = Convert.ToString(dr["FOName"]);
-                mh.AUDITTIME = Convert.ToString(dr["AuditTime"]);
-                mh.SPOCNAME = Convert.ToString(dr["SpocName"]);
-                mh.SPOCNUMBER = Convert.ToString(dr["SpocNumber"]);
-                mh.CHECKLISTYPE = Convert.ToString(dr["ChecklistType"]);
-                //dset = Fill("select * from MaxLifeChecklistImageMaster where ChecklistType=N'securityGuard' and BranchCode='" + dr["BranchCode"] + "' and USERID='" + dr["FOName"] + "' and  ChecklistId in (31, 37)");
-            }
-            foreach (DataRow dr in ds.Tables[0].Rows)
-            {
-                sh.Add(new SUBHEADER
+
+                foreach (DataRow dr in ds.Tables[1].Rows)
                 {
-                    MAINHEADER = Convert.ToString(dr["MainHeader"]),
 
-                });
-                sh.Distinct().OrderBy(x => x.MAINHEADER).ToList();
+                    mh.BRANCHCODE = Convert.ToString(dr["BranchCode"]);
+                    mh.BRANCHNAME = Convert.ToString(dr["BranchName"]);
+                    mh.FONAME = Convert.ToString(dr["FOName"]);
+                    mh.AUDITTIME = Convert.ToString(dr["AuditTime"]);
+                    mh.SPOCNAME = Convert.ToString(dr["SpocName"]);
+                    mh.SPOCNUMBER = Convert.ToString(dr["SpocNumber"]);
+                    mh.CHECKLISTYPE = Convert.ToString(dr["ChecklistType"]);
+                    //dset = Fill("select * from MaxLifeChecklistImageMaster where ChecklistType=N'securityGuard' and BranchCode='" + dr["BranchCode"] + "' and USERID='" + dr["FOName"] + "' and  ChecklistId in (31, 37)");
+                }
             }
-            foreach (DataRow dr in ds.Tables[2].Rows)
+            if (ds.Tables[0].Rows.Count > 0)
             {
-                mar1.Add(new MaxAuditReport1
+
+
+                foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    CHECKLIST_ID = Convert.ToInt32(dr["ChecklistId"]),
-                    MAINHEADER = Convert.ToString(dr["MainHeader"]),
-                    SUBHEADER = Convert.ToString(dr["SubHeader"]),
-                    NEWCHECKLISTID = Convert.ToInt32(dr["NewChecklistId"]),
-                    NEWCHECKLISTFORORDERBY = Convert.ToInt32(dr["NewChecklistIdForOrderBy"]),
-                    CHECKLISTTYPE = Convert.ToString(dr["ChecklistType"]),
-                    BRANCHCODE = Convert.ToString(dr["BranchCode"]),
-                    TEXT = Convert.ToString(dr["Text"]),
-                    REMARKS = Convert.ToString(dr["Remarks"]),
-                    ROWCOUNT = Convert.ToInt32(dr["row_count"]),
-                    HEADERINDEX = Convert.ToInt32(dr["HeaderIndex"]),
-                    IMGAUTO_ID = Convert.ToInt32(dr["ImageAutoId"]),
-                    LocationAutoId = Convert.ToInt32(dr["LocationAutoId"]),
-                });
+                    sh.Add(new SUBHEADER
+                    {
+                        MAINHEADER = Convert.ToString(dr["MainHeader"]),
+
+                    });
+                    sh.Distinct().OrderBy(x => x.MAINHEADER).ToList();
+                }
+
             }
-            foreach (DataRow dr in ds.Tables[3].Rows)
+            if (ds.Tables[2].Rows.Count > 0)
             {
 
 
-                mh1.BRANCHCODE = Convert.ToString(dr["BranchCode"]);
-                mh1.BRANCHNAME = Convert.ToString(dr["BranchName"]);
-                mh1.FONAME = Convert.ToString(dr["FOName"]);
-                mh1.AUDITTIME = Convert.ToString(dr["AuditTime"]);
-                mh1.SPOCNAME = Convert.ToString(dr["SpocName"]);
-                mh1.SPOCNUMBER = Convert.ToString(dr["SpocNumber"]);
-                mh1.CHECKLISTYPE = Convert.ToString(dr["ChecklistType"]);
-              
+                foreach (DataRow dr in ds.Tables[2].Rows)
+                {
+                    mar1.Add(new MaxAuditReport1
+                    {
+                        CHECKLIST_ID = Convert.ToInt32(dr["ChecklistId"]),
+                        MAINHEADER = Convert.ToString(dr["MainHeader"]),
+                        SUBHEADER = Convert.ToString(dr["SubHeader"]),
+                        NEWCHECKLISTID = Convert.ToInt32(dr["NewChecklistId"]),
+                        NEWCHECKLISTFORORDERBY = Convert.ToInt32(dr["NewChecklistIdForOrderBy"]),
+                        CHECKLISTTYPE = Convert.ToString(dr["ChecklistType"]),
+                        BRANCHCODE = Convert.ToString(dr["BranchCode"]),
+                        TEXT = Convert.ToString(dr["Text"]),
+                        REMARKS = Convert.ToString(dr["Remarks"]),
+                        ROWCOUNT = Convert.ToInt32(dr["row_count"]),
+                        HEADERINDEX = Convert.ToInt32(dr["HeaderIndex"]),
+                        IMGAUTO_ID = Convert.ToInt32(dr["ImageAutoId"]),
+                        LocationAutoId = Convert.ToInt32(dr["LocationAutoId"]),
+                    });
+                }
             }
-            dset = Fill("select * from MaxLifeChecklistImageMaster where ChecklistType=N'securityGuard' and BranchCode='" + Branch + "' and USERID='" + ds.Tables[1].Rows[0]["FOName"] + "' and  ChecklistId in (31, 37) and (convert(varchar,cast(datetime as date),106)) ='"+AuditDate+"' ");
+            if (ds.Tables[3].Rows.Count > 0)
+            {
+
+
+                foreach (DataRow dr in ds.Tables[3].Rows)
+                {
+
+
+                    mh1.BRANCHCODE = Convert.ToString(dr["BranchCode"]);
+                    mh1.BRANCHNAME = Convert.ToString(dr["BranchName"]);
+                    mh1.FONAME = Convert.ToString(dr["FOName"]);
+                    mh1.AUDITTIME = Convert.ToString(dr["AuditTime"]);
+                    mh1.SPOCNAME = Convert.ToString(dr["SpocName"]);
+                    mh1.SPOCNUMBER = Convert.ToString(dr["SpocNumber"]);
+                    mh1.CHECKLISTYPE = Convert.ToString(dr["ChecklistType"]);
+
+                }
+            }
+            if (ds.Tables[1].Rows.Count > 0)
+            {
+
+
+                dset = Fill("select * from MaxLifeChecklistImageMaster where ChecklistType=N'securityGuard' and BranchCode='" + Branch + "' and USERID='" + ds.Tables[1].Rows[0]["FOName"] + "' and  ChecklistId in (31, 37) and (convert(varchar,cast(datetime as date),106)) ='" + AuditDate + "' ");
+
+            }
+
+
             foreach (DataRow dr in ds.Tables[2].Rows)
             {
                 sh1.Add(new SUBHEADER1
@@ -147,6 +210,7 @@ namespace Sams.Extensions.Web.Controllers
             vm.midhead1 = mh1;
             vm.subheader1 = sh1;
             ViewBag.checklisttype = ChecklistType;
+
             if (dset.Tables[0].Rows.Count > 0)
             {
                 byte[] byteData = (byte[])dset.Tables[0].Rows[0]["image"];
@@ -165,25 +229,41 @@ namespace Sams.Extensions.Web.Controllers
             }
             //var data = _dataAccesLayer.GetReportValuesV2(Location, Branch, AuditDate, ChecklistType);
             return View(vm);
+
+
+
+
         }
         #region MaxAuditPDF 
-        // public string MaxAuditPDF(string Branch, string AuditDate, string Location, string ChecklistType)
-        public string MaxAuditPDF()
+        public ActionResult MaxAuditPDF(string Branch, string AuditDate, string Location, string ChecklistType)
+        //public ActionResult MaxAuditPDF()
         {
-            SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
-            converter.Options.MaxPageLoadTime = 240;
-            SelectPdf.PdfDocument doc = converter.ConvertUrl("http://localhost:50292/BranchNew/MaxAudit?Branch=APKT1&AuditDate=17%20Feb%202025&Location=206&ChecklistType=Housekeeping");
-            // SelectPdf.PdfDocument doc = converter.ConvertHtmlString(HTMLContent.ToString());
-            // doc.Save("test.pdf");
 
-            MemoryStream stream = new MemoryStream();
+            //string url = "http://localhost:50292/BranchNew/MaxAudit?Branch=APKT1&AuditDate=17%20Feb%202025&Location=206&ChecklistType=Housekeeping";
+
+
+
+            // Fetch HTML from the URL
+            var client = new WebClient();
+
+            //string htmlCode = client.DownloadString(url);
+            //           PdfDocument pdf = PdfGenerator.GeneratePdf(htmlCode,PdfSharp.PageSize.A4);
+            //           pdf.Save("url_to_pdf.pdf");
+
+
+
+            //SelectPdf.PdfDocument doc = converter.ConvertUrl("http://localhost:50292/BranchNew/MaxAudit?Branch=APKT1&AuditDate=17%20Feb%202025&Location=206&ChecklistType=Housekeeping");
+            //SelectPdf.PdfDocument doc = converter.ConvertHtmlString(HTMLContent.ToString());
+            //doc.Save("test.pdf");
+
+            //MemoryStream stream = new MemoryStream();
 
             //doc.Save(stream)
-            ;
+            //;
 
             //return File(stream.ToArray(), System.Net.Mime.MediaTypeNames.Application.Pdf, "Receipt.pdf");
-            doc.Save("RECEIPT.pdf");
-            return "RECEIPT.pdf";
+            //  doc.Save("RECEIPT.pdf");
+            //return "RECEIPT.pdf";
 
             //VEIWMODEL vm = new VEIWMODEL();
             //List<MaxAuditReport> mar = new List<MaxAuditReport>();
@@ -194,29 +274,29 @@ namespace Sams.Extensions.Web.Controllers
             //List<SUBHEADER1> sh1 = new List<SUBHEADER1>();
 
             //var data = _dataAccesLayer.GetReportValuesV2(Location, Branch, AuditDate, ChecklistType);
-            /* SqlCommand cmd = new SqlCommand("udp_GetMaxReportValuesUpdatedV2_New", con);
-             cmd.CommandType = CommandType.StoredProcedure;
-             cmd.Parameters.AddWithValue("@Clientcode", Branch);
-             cmd.Parameters.AddWithValue("@LocationautoId", Location);
-             cmd.Parameters.AddWithValue("@FromDate", AuditDate);
-             //cmd.Parameters.AddWithValue("@ChecklistType", ChecklistType);
-             SqlDataAdapter da = new SqlDataAdapter(cmd);
-             DataSet ds = new DataSet();
-             DataSet dset = new DataSet();
-             da.Fill(ds);
+            SqlCommand cmd = new SqlCommand("udp_GetMaxReportValuesUpdatedV2_New", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@Clientcode", Branch);
+            cmd.Parameters.AddWithValue("@LocationautoId", Location);
+            cmd.Parameters.AddWithValue("@FromDate", AuditDate);
+            //cmd.Parameters.AddWithValue("@ChecklistType", ChecklistType);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            DataSet dset = new DataSet();
+            da.Fill(ds);
 
 
 
-             var td2 = ds.Tables[2]; // HOurseKeeping 
+            var td2 = ds.Tables[2]; // HOurseKeeping 
 
-             var td3 = ds.Tables[3]; // HOurseKeeping header
+            var td3 = ds.Tables[3]; // HOurseKeeping header
 
-             var td0 = ds.Tables[0]; // SecurityGuard
+            var td0 = ds.Tables[0]; // SecurityGuard
 
-             var td1 = ds.Tables[1]; //SecurityGuard header
-             StringBuilder sb = new StringBuilder();
+            var td1 = ds.Tables[1]; //SecurityGuard header
+            StringBuilder sb = new StringBuilder();
 
-             string htmldesign = $@"
+            string htmldesign = $@"
      <!DOCTYPE html>
      <html lang=""en"">
      <head>
@@ -283,12 +363,12 @@ namespace Sams.Extensions.Web.Controllers
                  </thead>
   <tbody>";
 
-             sb.Append(htmldesign);
+            sb.Append(htmldesign);
 
-             foreach (DataRow dr in td3.Rows)
+            foreach (DataRow dr in td3.Rows)
 
-             {
-                 htmldesign = $@"<tr>
+            {
+                htmldesign = $@"<tr>
                                  <td style=""border: 1px solid #000; padding: 8px; text-align: center;"">{Convert.ToString(dr["BranchCode"])}</td>
                               <td style=""border: 1px solid #000; padding: 8px; text-align: center;"">{Convert.ToString(dr["BranchName"])}</td>
                               <td style=""border: 1px solid #000; padding: 8px; text-align: center;"">{Convert.ToString(dr["FOName"])}</td>
@@ -297,11 +377,11 @@ namespace Sams.Extensions.Web.Controllers
                              </tbody>
                              </table>
                              ";
-             }
-             sb.Append(htmldesign);
+            }
+            sb.Append(htmldesign);
 
 
-             htmldesign = @"
+            htmldesign = @"
          <table style=""width: 100%; border-collapse: collapse; margin-top: 20px""> <thead>
                  <tr  id=""row1"" style=""background-color: #EB8317; color: White; font-family: Arial; font-size: 11px; font-weight: bold; "">
                    <th style=""border: 1px solid #000000 !important;padding: 10px;width:9.7%"""" class=""""Column1 text-center"""">
@@ -323,17 +403,17 @@ namespace Sams.Extensions.Web.Controllers
              </thead>
              <tbody>";
 
-             sb.Append(htmldesign);
-             //  foreach (DataRow dr in td2.Rows)
+            sb.Append(htmldesign);
+            //  foreach (DataRow dr in td2.Rows)
 
-             //{
-             string mainHeader = Convert.ToString(td2.Rows[0]["MainHeader"]);
-             string CHECKLISTYPE = Convert.ToString(td3.Rows[0]["ChecklistType"]);
+            //{
+            string mainHeader = Convert.ToString(td2.Rows[0]["MainHeader"]);
+            string CHECKLISTYPE = Convert.ToString(td3.Rows[0]["ChecklistType"]);
 
-             var distinctHeaders = td2.AsEnumerable()
-                     .Select(row => row["MAINHEADER"].ToString())
-                     .Distinct();
-             htmldesign = $@"
+            var distinctHeaders = td2.AsEnumerable()
+                    .Select(row => row["MAINHEADER"].ToString())
+                    .Distinct();
+            htmldesign = $@"
                       <table class=""table-bordered"" style=""width: 100%;border-spacing:0px;"">
                                      <thead>
 
@@ -344,13 +424,13 @@ namespace Sams.Extensions.Web.Controllers
                                          </tr>
                                      </thead>
                                  </table>";
-             sb.Append(htmldesign);
-             foreach (var item in distinctHeaders)
-             {
+            sb.Append(htmldesign);
+            foreach (var item in distinctHeaders)
+            {
 
 
 
-                 htmldesign = $@" 
+                htmldesign = $@" 
 
      <table id=""table2"" class=""table-bordered"" style=""width: 100%;border-spacing:0px;"">
          <thead>
@@ -362,14 +442,14 @@ namespace Sams.Extensions.Web.Controllers
          </thead>
          <tbody>";
 
-                 sb.Append(htmldesign);
-                 foreach (DataRow dr1 in td2.Rows)
-                 {
+                sb.Append(htmldesign);
+                foreach (DataRow dr1 in td2.Rows)
+                {
 
 
-                     if (dr1["MAINHEADER"].ToString() == item)
+                    if (dr1["MAINHEADER"].ToString() == item)
 
-                         htmldesign = $@"
+                        htmldesign = $@"
                          <tr>
                              <td style=""border: 1px solid #000; padding: 8px; text-align: center;"">
                                  {Convert.ToString(dr1["row_count"])}
@@ -389,16 +469,16 @@ namespace Sams.Extensions.Web.Controllers
                              </td>
                          </tr>";
 
-                     sb.Append(htmldesign);
-                 }
-             }
-             //}
+                    sb.Append(htmldesign);
+                }
+            }
+            //}
 
-             //---- SecurityGuard start here-------------------------------
+            //---- SecurityGuard start here-------------------------------
 
-             //string CHECKLISTYPE2 = Convert.ToString(td1.Rows[0]["ChecklistType"]);
+            string CHECKLISTYPE2 = Convert.ToString(td1.Rows[0]["ChecklistType"]);
 
-             /* htmldesign += $@"  <table class=""""table-bordered"""" style=""""
+            htmldesign += $@"  <table class=""""table-bordered"""" style=""""
                  width: 100%; text-align:center; border-spacing:0px;
                  """">
                   <thead>
@@ -415,21 +495,17 @@ namespace Sams.Extensions.Web.Controllers
                   </thead>
    <tbody>";
 
+            string mainHeader2 = Convert.ToString(td0.Rows[0]["MAINHEADER"]);
 
 
-                    string mainHeader2 = Convert.ToString(td0.Rows[0]["MAINHEADER"]);
+            var distinctHeaders2 = td0.AsEnumerable()
+                    .Select(row => row["MainHeader"].ToString())
+                    .Distinct();
 
+            foreach (var item in distinctHeaders2)
+            {
 
-                    var distinctHeaders2 = td0.AsEnumerable()
-                            .Select(row => row["MainHeader"].ToString())
-                            .Distinct();
-
-                    foreach (var item in distinctHeaders2)
-                    {
-
-
-
-                        htmldesign += $@" 
+                htmldesign += $@" 
 
         <table id=""table2"" class=""table-bordered"" style=""width: 100%;border-spacing:0px;"">
             <thead>
@@ -441,13 +517,12 @@ namespace Sams.Extensions.Web.Controllers
             </thead>
             <tbody>";
 
-                        /*foreach (DataRow dr1 in td0.Rows)
-                        {
+                foreach (DataRow dr1 in td0.Rows)
+                {
 
+                    if (dr1["MAINHEADER"].ToString() == item)
 
-                            if (dr1["MAINHEADER"].ToString() == item)
-
-                                htmldesign += $@"
+                        htmldesign += $@"
                             <tr>
                                 <td style=""border: 1px solid #000; padding: 8px; text-align: center;"">
                                     {Convert.ToString(dr1["NewChecklistIdForOrderBy"])}
@@ -468,59 +543,90 @@ namespace Sams.Extensions.Web.Controllers
                             </tr>";
 
 
-                        }
-         }
-         */
+                }
+            }
 
 
-
-
-            /*
-
-            string pageSize = "A4"; string orientation = ""; string baseUrl = "";
 
 
             // Initialize the HTML to PDF converter
             HtmlToPdf converter = new HtmlToPdf();
             converter.Options.PdfPageSize = PdfPageSize.A4;
+            converter.Options.JpegCompressionLevel = 70;
             converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
             converter.Options.MarginTop = 20;
             converter.Options.MarginBottom = 20;
+            converter.Options.MarginLeft = 10;
+
+
+
+
+            converter.Options.KeepImagesTogether = true;
+            converter.Options.KeepTextsTogether = true;
+
             converter.Options.JavaScriptEnabled = true;
-        
+
+            //converter.Options.ManualPdfCreationDelay = 2000; // 2 seconds
+
+            converter.Options.MaxPageLoadTime = 60000;
 
 
 
+            string url = "http://localhost:50292/BranchNew/MaxAudit?Branch=AAMB1&AuditDate=07%20Mar%202025&Location=206&ChecklistType=SecurityGuard";
 
 
-            SelectPdf.PdfDocument doc = converter.ConvertHtmlString(sb.ToString(), baseUrl);
+            //SelectPdf.PdfDocument doc = converter.ConvertUrl("http://localhost:50292/BranchNew/MaxAudit?Branch=AAMB1&AuditDate=07%20Mar%202025&Location=206&ChecklistType=SecurityGuard");
 
-
-
-            using (MemoryStream memoryStream = new MemoryStream())
+            using (WebClient webClient = new WebClient())
+            using (Stream htmlStream = webClient.OpenRead(url)) // ✅ Corrected method
+            using (StreamReader reader = new StreamReader(htmlStream))
             {
-                // Save the PDF to the memory stream
-                doc.Save(memoryStream);
-                //doc.Close();
+                string html = reader.ReadToEnd();
 
-                // Reset the position of the memory stream to the beginning
-                memoryStream.Position = 0;
+                // ✅ Convert to PDF
 
-                // Generate a file name
-                DateTime date = DateTime.Now;
-                var namedate = date.ToString("dd-MM-yyyy-HH-mm-ss-fff");
-                string fileName = $"{namedate}.pdf";
+                PdfDocument doc1 = converter.ConvertHtmlString(html);
 
-                // Return the PDF as a file download to the client
-                return File(memoryStream.ToArray(), "application/octet-stream", fileName);
+                // ✅ Save the PDF
+                // doc1.Save("Downloads/file.pdf");
+                //doc1.Close();
+
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+
+                    try
+                    {
+                        doc1.Save(memoryStream);
+                    }
+                    catch (Exception e)
+                    {
+                        throw e;
+                    }
+
+                    doc1.Close();
+
+
+                    DateTime date = DateTime.Now;
+                    var namedate = date.ToString("dd-MM-yyyy-HH-mm-ss-fff");
+                    string fileName = $"{namedate}.pdf";
+
+
+                    return File(memoryStream.ToArray(), "application/octet-stream", fileName);
+                }
+
+
+
+
+
             }
 
 
-            */
 
 
 
-            // return View();
+
+
+            return View();
         }
 
 
@@ -531,11 +637,154 @@ namespace Sams.Extensions.Web.Controllers
 
 
 
+        public ActionResult EditMaxAudit(string Branch, string AuditDate, string Location, string ChecklistType)
+        {
+
+
+
+            VEIWMODEL vm = new VEIWMODEL();
+            List<MaxAuditReport> mar = new List<MaxAuditReport>();
+            List<MaxAuditReport1> mar1 = new List<MaxAuditReport1>();
+            MIDHEAD mh = new MIDHEAD();
+            MIDHEAD1 mh1 = new MIDHEAD1();
+            List<SUBHEADER> sh = new List<SUBHEADER>();
+            List<SUBHEADER1> sh1 = new List<SUBHEADER1>();
+
+            //var data = _dataAccesLayer.GetReportValuesV2(Location, Branch, AuditDate, ChecklistType);
+            SqlCommand cmd = new SqlCommand("udp_GetMaxReportValuesUpdatedV2_New", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@Clientcode", Branch);
+            cmd.Parameters.AddWithValue("@LocationautoId", Location);
+            cmd.Parameters.AddWithValue("@FromDate", AuditDate);
+            //cmd.Parameters.AddWithValue("@ChecklistType", ChecklistType);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            DataSet dset = new DataSet();
+
+            da.Fill(ds);
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                mar.Add(new MaxAuditReport
+                {
+                    ChecklistAutoID = Convert.ToInt32(dr["ChecklistAutoID"]),
+                    CHECKLIST_ID = Convert.ToInt32(dr["ChecklistId"]),
+                    MAINHEADER = Convert.ToString(dr["MainHeader"]),
+                    SUBHEADER = Convert.ToString(dr["SubHeader"]),
+                    NEWCHECKLISTID = Convert.ToInt32(dr["NewChecklistId"]),
+                    NEWCHECKLISTFORORDERBY = Convert.ToInt32(dr["NewChecklistIdForOrderBy"]),
+                    CHECKLISTTYPE = Convert.ToString(dr["ChecklistType"]),
+                    BRANCHCODE = Convert.ToString(dr["BranchCode"]),
+                    TEXT = Convert.ToString(dr["Text"]),
+                    REMARKS = Convert.ToString(dr["Remarks"]),
+                    ROWCOUNT = Convert.ToInt32(dr["row_count"]),
+                    HEADERINDEX = Convert.ToInt32(dr["HeaderIndex"]),
+                    IMGAUTO_ID = Convert.ToInt32(dr["ImageAutoId"]),
+                    LocationAutoId = Convert.ToInt32(dr["LocationAutoId"]),
+                });
+            }
+            foreach (DataRow dr in ds.Tables[1].Rows)
+            {
+
+                mh.BRANCHCODE = Convert.ToString(dr["BranchCode"]);
+                mh.BRANCHNAME = Convert.ToString(dr["BranchName"]);
+                mh.FONAME = Convert.ToString(dr["FOName"]);
+                mh.AUDITTIME = Convert.ToString(dr["AuditTime"]);
+                mh.SPOCNAME = Convert.ToString(dr["SpocName"]);
+                mh.SPOCNUMBER = Convert.ToString(dr["SpocNumber"]);
+                mh.CHECKLISTYPE = Convert.ToString(dr["ChecklistType"]);
+                //dset = Fill("select * from MaxLifeChecklistImageMaster where ChecklistType=N'securityGuard' and BranchCode='" + dr["BranchCode"] + "' and USERID='" + dr["FOName"] + "' and  ChecklistId in (31, 37)");
+            }
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                sh.Add(new SUBHEADER
+                {
+                    MAINHEADER = Convert.ToString(dr["MainHeader"]),
+
+                });
+                sh.Distinct().OrderBy(x => x.MAINHEADER).ToList();
+            }
+            foreach (DataRow dr in ds.Tables[2].Rows)
+            {
+                mar1.Add(new MaxAuditReport1
+                {
+                    ChecklistAutoID = Convert.ToInt32(dr["ChecklistAutoID"]),
+                    CHECKLIST_ID = Convert.ToInt32(dr["ChecklistId"]),
+                    MAINHEADER = Convert.ToString(dr["MainHeader"]),
+                    SUBHEADER = Convert.ToString(dr["SubHeader"]),
+                    NEWCHECKLISTID = Convert.ToInt32(dr["NewChecklistId"]),
+                    NEWCHECKLISTFORORDERBY = Convert.ToInt32(dr["NewChecklistIdForOrderBy"]),
+                    CHECKLISTTYPE = Convert.ToString(dr["ChecklistType"]),
+                    BRANCHCODE = Convert.ToString(dr["BranchCode"]),
+                    TEXT = Convert.ToString(dr["Text"]),
+                    REMARKS = Convert.ToString(dr["Remarks"]),
+                    ROWCOUNT = Convert.ToInt32(dr["row_count"]),
+                    HEADERINDEX = Convert.ToInt32(dr["HeaderIndex"]),
+                    IMGAUTO_ID = Convert.ToInt32(dr["ImageAutoId"]),
+                    LocationAutoId = Convert.ToInt32(dr["LocationAutoId"]),
+                });
+            }
+            foreach (DataRow dr in ds.Tables[3].Rows)
+            {
+
+
+                mh1.BRANCHCODE = Convert.ToString(dr["BranchCode"]);
+                mh1.BRANCHNAME = Convert.ToString(dr["BranchName"]);
+                mh1.FONAME = Convert.ToString(dr["FOName"]);
+                mh1.AUDITTIME = Convert.ToString(dr["AuditTime"]);
+                mh1.SPOCNAME = Convert.ToString(dr["SpocName"]);
+                mh1.SPOCNUMBER = Convert.ToString(dr["SpocNumber"]);
+                mh1.CHECKLISTYPE = Convert.ToString(dr["ChecklistType"]);
+
+            }
+            dset = Fill("select * from MaxLifeChecklistImageMaster where ChecklistType=N'securityGuard' and BranchCode='" + Branch + "' and USERID='" + ds.Tables[1].Rows[0]["FOName"] + "' and  ChecklistId in (31, 37) and (convert(varchar,cast(datetime as date),106)) ='" + AuditDate + "' ");
+            foreach (DataRow dr in ds.Tables[2].Rows)
+            {
+                sh1.Add(new SUBHEADER1
+                {
+                    MAINHEADER = Convert.ToString(dr["MainHeader"]),
+                    CHECKLISTID = Convert.ToInt32(dr["CHECKLISTID"]),
+
+                });
+                //sh1.Distinct().OrderBy(x => x.MAINHEADER).ToList();
+            }
+            vm.maxaudit = mar;
+            vm.midhead = mh;
+            vm.subheader = sh;
+            vm.maxaudit1 = mar1;
+            vm.midhead1 = mh1;
+            vm.subheader1 = sh1;
+            ViewBag.checklisttype = ChecklistType;
+            if (dset.Tables[0].Rows.Count > 0)
+            {
+                byte[] byteData = (byte[])dset.Tables[0].Rows[0]["image"];
+                string imreBase64Data = Convert.ToBase64String(byteData);
+                string imgDataURL = string.Format("data:image/jpeg;base64,{0}", imreBase64Data);
+                //Passing image data in viewbag to view
+                ViewBag.Image1 = imgDataURL;
+                if (dset.Tables[0].Rows.Count > 1)
+                {
+                    byte[] byteData1 = (byte[])dset.Tables[0].Rows[1]["image"];
+                    string imreBase64Data1 = Convert.ToBase64String(byteData1);
+                    string imgDataURL1 = string.Format("data:image/jpeg;base64,{0}", imreBase64Data1);
+                    //ViewBag.Image1 = dset.Tables[0].Rows[0]["image"];
+                    ViewBag.Image2 = imgDataURL1;
+                }
+            }
+            //var data = _dataAccesLayer.GetReportValuesV2(Location, Branch, AuditDate, ChecklistType);
+            return View(vm);
+
+
+
+
+        }
+
+
+
 
         public DataSet Fill(string sql)
         {
             DataSet ds = new DataSet();
-            //util.WriteLogFile("Apilog", "input'" + sql + "'", "", "", "", "", "", "", "Fill");
+
             using (SqlConnection sqcon = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString))
             {
                 try
@@ -544,6 +793,7 @@ namespace Sams.Extensions.Web.Controllers
                     sqcmd.CommandTimeout = 0;
                     SqlDataAdapter SqlDa = new SqlDataAdapter(sqcmd);
                     SqlDa.Fill(ds);
+
                 }
                 catch (Exception exce)
                 {
@@ -696,20 +946,69 @@ namespace Sams.Extensions.Web.Controllers
         public ActionResult RetrieveImage(int ImageId)
         {
             byte[] cover = _dataAccesLayer.GetImageById(ImageId, true);
-            if (cover != null)
-            {
-                return File(cover, "image/jpg");
-            }
-            else
+            if (cover == null)
             {
                 string path = Server.MapPath("~/Images/NoImagesFound.jpg");
-
-                //Read the File data into Byte Array.
-                byte[] bytes = System.IO.File.ReadAllBytes(path);
-
-                //Send the File to Download.
-                return File(bytes, "image/jpg");
+                cover = System.IO.File.ReadAllBytes(path);
             }
+
+
+            byte[] compressedImage = CompressImage(cover, 20);
+
+            return File(compressedImage, "image/jpeg");
+            //byte[] cover = _dataAccesLayer.GetImageById(ImageId, true);
+            //if (cover != null)
+            //{
+            //    return File(cover, "image/jpg");
+            //}
+            //else
+            //{
+            //    string path = Server.MapPath("~/Images/NoImagesFound.jpg");
+
+            //    //Read the File data into Byte Array.
+            //    byte[] bytes = System.IO.File.ReadAllBytes(path);
+
+            //    //Send the File to Download.
+            //    return File(bytes, "image/jpg");
+            //}
+        }
+
+        private byte[] CompressImage(byte[] imageBytes, long quality)
+        {
+            using (MemoryStream inputStream = new MemoryStream(imageBytes))
+            {
+                using (Image image = Image.FromStream(inputStream))
+                {
+                    using (MemoryStream outputStream = new MemoryStream())
+                    {
+                        ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+                        EncoderParameters encoderParams = new EncoderParameters(1);
+                        encoderParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, quality);
+
+
+                        image.Save(outputStream, jpgEncoder, encoderParams);
+                        return outputStream.ToArray();
+                    }
+                }
+            }
+        }
+
+        public byte[] ImageToBinary(string imagePath)
+        {
+            //string absolutePath = HostingEnvironment.MapPath(imagePath);
+
+
+            FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
+            byte[] buffer = new byte[fileStream.Length];
+            fileStream.Read(buffer, 0, (int)fileStream.Length);
+            //fileStream.Close();
+            return buffer;
+        }
+
+        private ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            return ImageCodecInfo.GetImageDecoders()
+                   .FirstOrDefault(codec => codec.FormatID == format.Guid);
         }
         [AllowAnonymous]
         public ActionResult ViewMore(string CheckListId, string AuditDate, string Location, string Branch, string CheckListType)
@@ -745,6 +1044,7 @@ namespace Sams.Extensions.Web.Controllers
             try
             {
 
+
                 string query = $@"delete from MaxLifeChecklistMaster where BranchCode='{clientCode}' and (convert(varchar,cast(ChecklistTime as date),106)) = '{auditdate}'; delete from MaxLifeChecklistImageMaster where BranchCode='{clientCode}' and (convert(varchar,cast(datetime as date),106)) = '{auditdate}'";
 
                 msg = ExecQuery(query);
@@ -756,16 +1056,66 @@ namespace Sams.Extensions.Web.Controllers
                 throw ex;
             }
 
-
             return Json(msg);
         }
 
+        public JsonResult Update(HttpPostedFileBase ImgFile, string ImageId, string checklisid, string remark)
+        {
+            string _FileName = Path.GetFileName(ImgFile.FileName);
+            string msg = "";
+
+            try
+            {
+                string base64String = null;
+
+                if (_FileName != null && ImgFile.ContentLength > 0)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        ImgFile.InputStream.CopyTo(ms);
+                        byte[] imageBytes = ms.ToArray();
 
 
+                        base64String = Convert.ToBase64String(imageBytes, 0, imageBytes.Length);
+                        byte[] imageBytes3 = Convert.FromBase64String(base64String);
+                        var ds = new DataSet();
+
+                        using (var scn = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString))
+                        {
+                            SqlCommand command;
+                            command = new SqlCommand("Udp_UpdateImageandRamark", scn);
+                            command.CommandType = CommandType.StoredProcedure;
+
+                            command.Parameters.Add("@ImageAutoId", SqlDbType.Int).Value = ImageId;
+                            if (imageBytes3 != null && imageBytes3.Length > 0)
+                            {
+                                command.Parameters.Add("@Image", SqlDbType.Image).Value = (object)imageBytes3 ?? DBNull.Value;
+                            }
+                            else
+                            {
+                                command.Parameters.Add("@Image", SqlDbType.Image).Value = (object)imageBytes3 ?? DBNull.Value;
+                            }
+                            scn.Open();
+                            var adapter = new SqlDataAdapter(command);
+                            adapter.Fill(ds);
+
+                        }
 
 
+                        string query = $@"UPDATE MaxLifeChecklistMaster SET Remarks='{remark}' WHERE ChecklistAutoID='{checklisid}'";
+                        msg = ExecQuery(query);
+                    }
 
 
+                }
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+
+            return Json(msg);
+        }
 
     }
 
