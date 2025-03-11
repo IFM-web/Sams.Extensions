@@ -1,13 +1,7 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Office.Word;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Org.BouncyCastle.Bcpg.OpenPgp;
-using Sams.Extensions.Business;
+﻿using Sams.Extensions.Business;
 using Sams.Extensions.Dal;
 using Sams.Extensions.Logger;
-using Sams.Extensions.Model;
 using Sams.Extensions.Web.Models;
-using PdfSharp.Pdf;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -17,29 +11,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.util;
 using System.Web;
 using System.Web.Mvc;
-using PdfSharp.Pdf;
 using System.Drawing;
 using System.Drawing.Imaging;
-
-using TheArtOfDev.HtmlRenderer.PdfSharp;
-
-
-using PageSize = PdfSharpCore.PageSize;
-using DocumentFormat.OpenXml.Spreadsheet;
-using PdfSharp;
 using SelectPdf;
 using PdfDocument = SelectPdf.PdfDocument;
-using System.Net.Http;
-using System.Threading.Tasks;
-using IronSoftware.Forms;
-using System.Drawing.Imaging;
-using System.Security.Policy;
-using System.Windows.Interop;
-using System.Net.NetworkInformation;
-using System.Web.Hosting;
 
 
 
@@ -953,7 +930,7 @@ namespace Sams.Extensions.Web.Controllers
             }
 
 
-            byte[] compressedImage = CompressImage(cover, 20);
+            byte[] compressedImage = CompressImage(cover, 50);
 
             return File(compressedImage, "image/jpeg");
             //byte[] cover = _dataAccesLayer.GetImageById(ImageId, true);
@@ -993,17 +970,7 @@ namespace Sams.Extensions.Web.Controllers
             }
         }
 
-        public byte[] ImageToBinary(string imagePath)
-        {
-            //string absolutePath = HostingEnvironment.MapPath(imagePath);
-
-
-            FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
-            byte[] buffer = new byte[fileStream.Length];
-            fileStream.Read(buffer, 0, (int)fileStream.Length);
-            //fileStream.Close();
-            return buffer;
-        }
+     
 
         private ImageCodecInfo GetEncoder(ImageFormat format)
         {
@@ -1061,14 +1028,14 @@ namespace Sams.Extensions.Web.Controllers
 
         public JsonResult Update(HttpPostedFileBase ImgFile, string ImageId, string checklisid, string remark)
         {
-            string _FileName = Path.GetFileName(ImgFile.FileName);
+           // string _FileName = Path.GetFileName(ImgFile.FileName);
             string msg = "";
 
             try
             {
                 string base64String = null;
 
-                if (_FileName != null && ImgFile.ContentLength > 0)
+                if (ImgFile != null && ImgFile.ContentLength > 0)
                 {
                     using (var ms = new MemoryStream())
                     {
@@ -1102,12 +1069,13 @@ namespace Sams.Extensions.Web.Controllers
                         }
 
 
-                        string query = $@"UPDATE MaxLifeChecklistMaster SET Remarks='{remark}' WHERE ChecklistAutoID='{checklisid}'";
-                        msg = ExecQuery(query);
+                        
                     }
-
+                    
 
                 }
+                string query = $@"UPDATE MaxLifeChecklistMaster SET Remarks='{remark}' WHERE ChecklistAutoID='{checklisid}'";
+                msg = ExecQuery(query);
             }
             catch (Exception ex)
             {
